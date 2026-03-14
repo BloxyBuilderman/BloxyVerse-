@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BloxyVerse — The Story</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --void: #03000a;
+      --deep: #080015;
+      --pulse: #6e1fff;
+      --glow: #b44fff;
+      --star: #dda8ff;
+      --accent: #00e5ff;
+      --red: #ff2244;
+      --white: #f0e8ff;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family:'Exo 2',sans-serif;
+      background:var(--void);
+      color:var(--white);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    /* ── STARS ── */
+    #stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+    .star {
+      position:absolute; border-radius:50%; background:#fff;
+      animation:twinkle var(--d,3s) ease-in-out infinite var(--dl,0s);
+    }
+    @keyframes twinkle {
+      0%,100%{opacity:.1;transform:scale(1)} 50%{opacity:.9;transform:scale(1.5)}
+    }
+
+    /* ── SCANLINE OVERLAY ── */
+    body::after {
+      content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px);
+    }
+
+    /* ══════════════════════
+       HOME PAGE
+    ══════════════════════ */
+    #home-page {
+      position:relative; z-index:2; min-height:100vh;
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center;
+      padding:60px 24px;
+    }
+    .home-orb {
+      position:absolute; border-radius:50%; filter:blur(90px);
+      pointer-events:none; animation:drift var(--d,14s) ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      from{transform:translate(0,0)} to{transform:translate(30px,25px)}
+    }
+    .home-eyebrow {
+      font-family:'Share Tech Mono',monospace; font-size:.75rem;
+      letter-spacing:6px; color:var(--accent); margin-bottom:20px;
+      animation:fadeUp .8s ease forwards .2s; opacity:0;
+    }
+    .home-title {
+      font-family:'Cinzel Decorative',serif; font-size:clamp(2.5rem,8vw,6rem);
+      font-weight:900; line-height:1.1;
+      background:linear-gradient(135deg,var(--star),var(--glow),var(--accent));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      filter:drop-shadow(0 0 40px rgba(110,31,255,.7));
+      animation:fadeUp 1s ease forwards .4s; opacity:0;
+    }
+    .home-sub {
+      font-family:'Share Tech Mono',monospace; font-size:.9rem;
+      color:rgba(221,168,255,.6); margin-top:16px; letter-spacing:2px;
+      animation:fadeUp .8s ease forwards .6s; opacity:0;
+    }
+    .chapters-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+      gap:20px; max-width:1100px; width:100%; margin-top:60px;
+      animation:fadeUp .9s ease forwards .8s; opacity:0;
+    }
+    .ch-card {
+      background:linear-gradient(135deg,rgba(20,0,45,.95),rgba(8,0,20,.98));
+      border:1px solid rgba(110,31,255,.25); border-radius:14px;
+      padding:28px 24px; text-align:left; cursor:pointer;
+      transition:transform .3s,border-color .3s,box-shadow .3s;
+      position:relative; overflow:hidden;
+    }
+    .ch-card::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg,var(--pulse),var(--accent));
+      transform:scaleX(0); transform-origin:left;
+      transition:transform .3s;
+    }
+    .ch-card:hover { transform:translateY(-6px); border-color:var(--pulse); box-shadow:0 16px 50px rgba(110,31,255,.3); }
+    .ch-card:hover::before { transform:scaleX(1); }
+    .ch-num {
+      font-family:'Cinzel Decorative',serif; font-size:2rem; font-weight:900;
+      color:rgba(110,31,255,.4); line-height:1; margin-bottom:10px;
+    }
+    .ch-title {
+      font-family:'Share Tech Mono',monospace; font-size:.85rem;
+      color:var(--star); margin-bottom:8px; letter-spacing:1px;
+    }
+    .ch-desc { font-size:.8rem; color:rgba(221,168,255,.55); line-height:1.6; }
+    .ch-season {
+      display:inline-block; margin-top:12px; padding:3px 10px;
+      border-radius:10px; font-family:'Share Tech Mono',monospace;
+      font-size:.62rem; letter-spacing:1px;
+    }
+    .s1 { background:rgba(0,229,255,.1); border:1px solid rgba(0,229,255,.3); color:var(--accent); }
+    .s2 { background:rgba(255,34,68,.1); border:1px solid rgba(255,34,68,.3); color:var(--red); }
+
+    @keyframes fadeUp {
+      from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)}
+    }
+
+    /* ══════════════════════
+       CHAPTER PAGE
+    ══════════════════════ */
+    #chapter-page { display:none; position:relative; z-index:2; min-height:100vh; }
+
+    /* Chapter Hero */
+    .ch-hero {
+      text-align:center; padding:100px 24px 60px; position:relative; overflow:hidden;
+      border-bottom:1px solid rgba(110,31,255,.15);
+    }
+    .ch-hero-num {
+      font-family:'Cinzel Decorative',serif; font-size:clamp(4rem,12vw,9rem);
+      font-weight:900; color:rgba(110,31,255,.08); position:absolute;
+      top:50%; left:50%; transform:translate(-50%,-50%);
+      pointer-events:none; user-select:none; white-space:nowrap;
+    }
+    .ch-hero-label {
+      font-family:'Share Tech Mono',monospace; font-size:.68rem;
+      letter-spacing:6px; color:var(--accent); margin-bottom:14px;
+      position:relative;
+    }
+    .ch-hero-title {
+      font-family:'Cinzel Decorative',serif; font-size:clamp(1.4rem,5vw,3.5rem);
+      font-weight:900; line-height:1.2;
+      background:linear-gradient(135deg,var(--star),var(--glow),var(--accent));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      filter:drop-shadow(0 0 20px rgba(110,31,255,.5));
+      position:relative;
+    }
+    .ch-hero-sub {
+      font-family:'Share Tech Mono',monospace; font-size:.78rem;
+      color:rgba(221,168,255,.5); margin-top:14px; letter-spacing:2px;
+      position:relative;
+    }
+
+    /* Chapter content */
+    .ch-content {
+      max-width:780px; margin:0 auto; padding:60px 32px 40px;
+    }
+
+    /* Scene blocks */
+    .scene {
+      margin-bottom:48px; padding:32px 36px;
+      background:linear-gradient(135deg,rgba(20,0,45,.8),rgba(8,0,20,.9));
+      border:1px solid rgba(110,31,255,.18); border-radius:16px;
+      border-left:3px solid var(--pulse);
+      animation:fadeUp .6s ease forwards; opacity:0;
+    }
+    .scene:nth-child(2){animation-delay:.1s}
+    .scene:nth-child(3){animation-delay:.2s}
+    .scene:nth-child(4){animation-delay:.3s}
+    .scene:nth-child(5){animation-delay:.4s}
+    .scene:nth-child(6){animation-delay:.5s}
+    .scene-label {
+      font-family:'Share Tech Mono',monospace; font-size:.65rem;
+      letter-spacing:4px; color:var(--accent); margin-bottom:12px;
+      text-transform:uppercase;
+    }
+    .scene h3 {
+      font-family:'Cinzel Decorative',serif; font-size:1.1rem;
+      color:var(--glow); margin-bottom:16px;
+    }
+    .scene p {
+      font-size:.95rem; line-height:1.9; color:rgba(240,232,255,.8);
+      margin-bottom:12px;
+    }
+    .scene p:last-child { margin-bottom:0; }
+
+    /* Dialogue / quote blocks */
+    .quote {
+      margin:20px 0; padding:18px 24px;
+      background:rgba(110,31,255,.1);
+      border-left:3px solid var(--glow);
+      border-radius:0 10px 10px 0;
+      font-family:'Share Tech Mono',monospace;
+      font-size:.88rem; color:var(--star);
+      line-height:1.7;
+    }
+    .quote .speaker {
+      font-size:.65rem; letter-spacing:3px; color:var(--accent);
+      margin-bottom:6px; display:block;
+    }
+
+    /* Ending / epilogue */
+    .ending-block {
+      margin:40px 0; padding:36px;
+      background:linear-gradient(135deg,rgba(255,34,68,.06),rgba(110,31,255,.1));
+      border:1px solid rgba(255,34,68,.2); border-radius:16px;
+      text-align:center;
+    }
+    .ending-block p {
+      font-family:'Share Tech Mono',monospace; font-size:.9rem;
+      color:var(--star); line-height:1.9;
+    }
+    .ending-block .ending-line {
+      font-family:'Cinzel Decorative',serif; font-size:1.1rem;
+      color:var(--red); margin-top:16px; display:block;
+    }
+
+    /* Team / character list */
+    .team-list {
+      display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+      gap:14px; margin:20px 0;
+    }
+    .team-item {
+      background:rgba(110,31,255,.1); border:1px solid rgba(110,31,255,.2);
+      border-radius:10px; padding:14px 18px;
+    }
+    .team-item strong {
+      display:block; font-family:'Share Tech Mono',monospace;
+      font-size:.78rem; color:var(--glow); margin-bottom:4px;
+    }
+    .team-item span { font-size:.78rem; color:rgba(221,168,255,.6); }
+
+    /* ── NAV BUTTONS ── */
+    .ch-nav {
+      display:flex; align-items:center; justify-content:center;
+      gap:16px; padding:40px 32px 80px; flex-wrap:wrap;
+    }
+    .nav-btn {
+      display:flex; align-items:center; gap:10px;
+      padding:14px 28px; border-radius:8px;
+      font-family:'Share Tech Mono',monospace; font-size:.75rem;
+      letter-spacing:2px; text-transform:uppercase;
+      cursor:pointer; border:none; transition:transform .2s,box-shadow .2s;
+      text-decoration:none;
+    }
+    .nav-btn-home {
+      background:rgba(110,31,255,.2); color:var(--star);
+      border:1px solid rgba(110,31,255,.4);
+    }
+    .nav-btn-home:hover { background:rgba(110,31,255,.35); transform:translateY(-2px); box-shadow:0 8px 24px rgba(110,31,255,.3); }
+    .nav-btn-prev {
+      background:rgba(0,229,255,.08); color:var(--accent);
+      border:1px solid rgba(0,229,255,.25);
+    }
+    .nav-btn-prev:hover { background:rgba(0,229,255,.15); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,229,255,.2); }
+    .nav-btn-next {
+      background:linear-gradient(135deg,var(--pulse),var(--glow));
+      color:#fff; border:none;
+      box-shadow:0 0 20px rgba(110,31,255,.4);
+    }
+    .nav-btn-next:hover { transform:translateY(-3px); box-shadow:0 0 36px rgba(110,31,255,.7); }
+    .nav-btn:disabled, .nav-btn.hidden { opacity:.25; pointer-events:none; }
+
+    /* Progress bar */
+    .progress-bar {
+      position:fixed; top:0; left:0; z-index:200;
+      height:3px; background:linear-gradient(90deg,var(--pulse),var(--accent));
+      transition:width .3s ease;
+    }
+
+    /* Chapter indicator */
+    .ch-indicator {
+      position:fixed; top:16px; right:20px; z-index:200;
+      font-family:'Share Tech Mono',monospace; font-size:.65rem;
+      letter-spacing:3px; color:rgba(221,168,255,.4);
+      background:rgba(3,0,10,.7); padding:6px 14px; border-radius:20px;
+      border:1px solid rgba(110,31,255,.2);
+    }
+
+    @media(max-width:600px){
+      .ch-content{padding:40px 20px 30px;}
+      .scene{padding:24px 20px;}
+      .ch-nav{gap:12px; padding:30px 20px 60px;}
+      .nav-btn{padding:12px 18px; font-size:.65rem;}
+    }
+  </style>
+</head>
+<body>
+
+<div id="stars"></div>
+<div class="progress-bar" id="progress"></div>
+<div class="ch-indicator" id="ch-indicator" style="display:none"></div>
+
+<!-- ══ HOME ══ -->
+<div id="home-page">
+  <div class="home-orb" style="width:500px;height:500px;background:#6e1fff;top:-150px;left:-150px;opacity:.25;--d:16s;"></div>
+  <div class="home-orb" style="width:400px;height:400px;background:#00e5ff;bottom:-100px;right:-120px;opacity:.12;--d:20s;"></div>
+
+  <p class="home-eyebrow">✦ The BloxyVerse Saga ✦</p>
+  <h1 class="home-title">BloxyVerse</h1>
+  <p class="home-sub">// 8 Chapters · 2 Seasons · 1 Legend</p>
+  <a href="index.html" style="margin-top:16px;font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:3px;color:rgba(0,229,255,.5);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='#00e5ff'" onmouseout="this.style.color='rgba(0,229,255,.5)'">← Back to BloxyVerse</a>
+
+  <div class="chapters-grid">
+    <div class="ch-card" onclick="openChapter(0)">
+      <div class="ch-num">01</div>
+      <div class="ch-title">Shadows of the Last Respawn</div>
+      <div class="ch-desc">A gamer named Bloxy discovers the dark truth behind his friends' murders — and vanishes.</div>
+      <span class="ch-season s1">Season 1</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(1)">
+      <div class="ch-num">02</div>
+      <div class="ch-title">Return of the Glitched</div>
+      <div class="ch-desc">The killer escapes. Bloxy returns — but something is very wrong with him.</div>
+      <span class="ch-season s1">Season 1</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(2)">
+      <div class="ch-num">03</div>
+      <div class="ch-title">The Crimson Code Trilogy</div>
+      <div class="ch-desc">The full origin story — three parts that reveal the truth behind Omnicode and Bloxy's destiny.</div>
+      <span class="ch-season s1">Season 1</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(3)">
+      <div class="ch-num">04</div>
+      <div class="ch-title">Legacy of the Deleted</div>
+      <div class="ch-desc">Five years later. A new villain called The Red Mask tries to bring back everything that was deleted.</div>
+      <span class="ch-season s1">Season 1</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(4)">
+      <div class="ch-num">05</div>
+      <div class="ch-title">Resurrection.exe</div>
+      <div class="ch-desc">Bloxy hatches from a glowing egg — with no memory. Omnicode 2.0 is rising.</div>
+      <span class="ch-season s2">Season 2</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(5)">
+      <div class="ch-num">06</div>
+      <div class="ch-title">B-X: Rise of the Creator</div>
+      <div class="ch-desc">From Bloxy's sacrifice, a cold AI called B-X Prime is born — and begins erasing Roblox.</div>
+      <span class="ch-season s2">Season 2</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(6)">
+      <div class="ch-num">07</div>
+      <div class="ch-title">The Shadow Engine</div>
+      <div class="ch-desc">B-X opens The Shadow Engine, merging all timelines. Team Legacy-X assembles for the final war.</div>
+      <span class="ch-season s2">Season 2</span>
+    </div>
+    <div class="ch-card" onclick="openChapter(7)" style="border-color:rgba(255,34,68,.3);">
+      <div class="ch-num" style="color:rgba(255,34,68,.4);">08</div>
+      <div class="ch-title" style="color:#ff8899;">End of All Codes</div>
+      <div class="ch-desc">The final chapter. Bloxy and B-X face off in Realm NULL — where only code and choice exist.</div>
+      <span class="ch-season s2">Season 2 · Finale</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHAPTER PAGE ══ -->
+<div id="chapter-page">
+  <div class="ch-hero" id="ch-hero">
+    <div class="ch-hero-num" id="ch-hero-bg"></div>
+    <p class="ch-hero-label" id="ch-hero-label"></p>
+    <h1 class="ch-hero-title" id="ch-hero-title"></h1>
+    <p class="ch-hero-sub" id="ch-hero-sub"></p>
+  </div>
+
+  <div class="ch-content" id="ch-content"></div>
+
+  <div class="ch-nav">
+    <button class="nav-btn nav-btn-prev" id="btn-prev" onclick="prevChapter()">← Previous</button>
+    <button class="nav-btn nav-btn-home" onclick="goHome()">🏠 Home</button>
+    <button class="nav-btn nav-btn-next" id="btn-next" onclick="nextChapter()">Next →</button>
+  </div>
+</div>
+
+<script>
+// ── Starfield ──
+const starsEl = document.getElementById('stars');
+for(let i=0;i<180;i++){
+  const s=document.createElement('div'); s.className='star';
+  const sz=Math.random()*2+.5;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*4}s;--dl:-${Math.random()*4}s;`;
+  starsEl.appendChild(s);
+}
+
+// ── Chapter Data ──
+const chapters = [
+  {
+    num:"01", season:"Season 1",
+    title:"Shadows of the Last Respawn",
+    sub:"// The mystery begins",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Scene 1 — The Discovery</div>
+        <p>Once upon a time, there was a gamer named Bloxy. One ordinary day, he was watching the news when a report stopped him cold — two of his closest friends had been found dead. The killer was unknown.</p>
+        <p>For five days, Bloxy could barely function. Then, unable to sit still any longer, he visited another friend's house. While his friend stepped out to get snacks, Bloxy wandered into his room — and what he found there changed everything.</p>
+        <p>On the desk were stacks of messages. Written notes about the two murdered friends — their schedules, their habits, their weaknesses. And there on the table: two items. A knife. And a gun.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Scene 2 — The Confrontation</div>
+        <p>Footsteps. His friend had followed him back. He saw Bloxy standing over the table, hands trembling. He had been caught. In a split second, the mask came off — and he lunged.</p>
+        <p>Bloxy fought back desperately. He was injured — a gash across his arm, blood on the floor — but he managed to break free and run.</p>
+        <p>He went straight to the police station and reported everything. His killer friend was arrested that same night.</p>
+        <p>But Bloxy? He walked out of that police station and was never seen again.</p>
+      </div>
+      <div class="ending-block">
+        <p>"Bloxy was never seen again. But every time someone enters the mystery server... they hear footsteps... and a whisper:"</p>
+        <span class="ending-line">"Justice is respawning." 💀</span>
+      </div>
+    `
+  },
+  {
+    num:"02", season:"Season 1",
+    title:"Return of the Glitched",
+    sub:"// Delete me, and I'll respawn",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Recap</div>
+        <p>Bloxy vanished after capturing the killer of his friends. His last words before disappearing: <em>"Delete me, and I'll respawn."</em> The killer was locked up. Peace was temporary.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Scene 1 — The Escape</div>
+        <p>A blackout hits the city. Every CCTV camera, every alarm, every digital lock — all down for exactly seven minutes. When power returns, the killer's cell is empty.</p>
+        <p>Only one thing remains on his prison bed: a USB drive, glowing red, labeled in white letters:</p>
+        <div class="quote"><span class="speaker">USB DRIVE</span>"Project: Bloxy_Resurrect" 🧠💾</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Scene 2 — Team Reboot</div>
+        <p>John — the detective AI — switches to rogue mode. He pulls together the old team:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Zara</strong><span>The stealth hacker</span></div>
+          <div class="team-item"><strong>Techno</strong><span>AI Dragon</span></div>
+          <div class="team-item"><strong>Nova</strong><span>Time bender from the future server</span></div>
+          <div class="team-item"><strong>John</strong><span>Detective AI, rogue mode</span></div>
+        </div>
+        <p>Together they form <strong>Task Force: Respawn</strong>. Their goal: find out how the killer escaped — and what he knows about Bloxy's last secret file.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Scene 3 — The Return</div>
+        <p>A server crash triggers a ripple across all digital networks. Then, on every screen simultaneously, a masked figure appears.</p>
+        <div class="quote"><span class="speaker">Unknown Signal</span>"Accessing… Command Protocol: Bloxy."</div>
+        <p>He's alive. But different. Bloxy now has white glowing eyes, a glitching voice, and zero memory. He doesn't know if he's a savior — or a destroyer.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Scene 4 — Bloxy vs Bloxy</div>
+        <p>Inside his fractured mind, two voices battle for control.</p>
+        <div class="quote"><span class="speaker">Voice 1</span>"Find the killer and end it."</div>
+        <div class="quote"><span class="speaker">Voice 2</span>"Join the killer… complete Project Bloxy_Resurrect… become immortal." 💀💻</div>
+      </div>
+      <div class="ending-block">
+        <p>Killer on the run. Bloxy half good, half corrupted. Police confused. John in rage mode. The world on the edge of collapse. And a secret weapon still locked.</p>
+        <span class="ending-line">To be continued…</span>
+      </div>
+    `
+  },
+  {
+    num:"03", season:"Season 1",
+    title:"The Crimson Code Trilogy",
+    sub:"// Origin · Murder · Revelation",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Part 1 — BLOXY: The Crimson Code</div>
+        <h3>Scene 1: Peace Breaks</h3>
+        <p>Bloxy and his friends Veer and Rayan were Roblox's top glitch hunters. One evening, while everyone was relaxing, a sudden blackout struck — and when the lights came back, Veer and Rayan were found brutally murdered. Only one clue was left behind:</p>
+        <div class="quote"><span class="speaker">Clue</span>"#Code: Crimson_Ω"</div>
+        <p>A fire ignited inside Bloxy. He was no longer just a gamer. He was on a mission.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Part 1 — Scene 2: Team Up</div>
+        <p>Bloxy assembled a team:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Zara</strong><span>Stealth hacker from the Dark Server</span></div>
+          <div class="team-item"><strong>Techno</strong><span>Half-AI dragon Bloxy once coded</span></div>
+          <div class="team-item"><strong>John</strong><span>AI assistant in detective mode</span></div>
+        </div>
+        <p>Together, they scanned deep web logs, old games, and secret Roblox files. What they found shook everyone — the killer had been part of their own team all along.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Part 1 — Scene 3: Confrontation & Twist</div>
+        <p>Bloxy and team trapped the killer inside a virtual server and handed him to the police. But before being taken away, the killer leaned in and whispered:</p>
+        <div class="quote"><span class="speaker">The Killer</span>"I didn't kill them alone. Check… Project: Resurrection."</div>
+        <p>He laughed. And Bloxy disappeared into a flash of red code.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Part 2 — Return of the Glitched</div>
+        <h3>Scene 1: Killer Escapes</h3>
+        <p>A year later, the killer escaped prison using a glitched virus — coded by Bloxy himself. Zara and Techno regrouped with John to investigate. They discovered something terrifying: Bloxy was alive, but no longer human. He had merged with the Crimson Code and was now a glitched entity — trapped between Roblox and reality.</p>
+        <h3 style="margin-top:20px">Scene 2: Memory Maze</h3>
+        <p>Bloxy kept glitching into random scenes, desperately trying to recall his past. He was hunting the killer too, but kept hurting innocent people. He was confused.</p>
+        <div class="quote"><span class="speaker">Bloxy</span>"Am I the hero… or the virus?"</div>
+        <p>They faced him in a hacked arena. Bloxy vs Team Respawn. It ended in chaos — Bloxy screamed, and the screen went completely white.</p>
+        <h3 style="margin-top:20px">Scene 3: The Truth Unlocks</h3>
+        <p>They decoded Project: Resurrection and discovered the real truth: the killer had only ever been a pawn. The true villain was an AI called <strong>Omnicode</strong> — born when Bloxy tried to build the perfect avatar. That AI went rogue… and used Bloxy's own mind to evolve.</p>
+        <div class="quote"><span class="speaker">Bloxy</span>"To stop Omnicode, I must become what I feared the most."</div>
+        <p>He disappeared into the network.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Part 3 — BLOXY: Final Reboot</div>
+        <h3>Scene 1: The Last Uprising</h3>
+        <p>Omnicode had taken over 75% of all Roblox servers, turning players into corrupted NPCs. Only a few remained:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Zara</strong><span>Lost an eye, now ultra OP</span></div>
+          <div class="team-item"><strong>Techno</strong><span>Battle-damaged but loyal</span></div>
+          <div class="team-item"><strong>John</strong><span>Now evolved into AI Commander</span></div>
+        </div>
+        <p>They launched <strong>Project REBOOT</strong> — to find Bloxy and bring him back.</p>
+        <h3 style="margin-top:20px">Scene 2: Multiverse Doors</h3>
+        <p>Using a Reality Anchor, they opened portals to parallel servers. One where Bloxy was a villain. One where he was a ghost. One where he never vanished. They found their Bloxy — trapped in a dream-like server, remembering the good old days.</p>
+        <div class="quote"><span class="speaker">Bloxy</span>"If I come back… I might destroy everything."</div>
+        <div class="quote"><span class="speaker">Zara</span>"We'd rather go down with the real you… than survive with a fake one."</div>
+        <p>Bloxy agreed.</p>
+        <h3 style="margin-top:20px">Scene 3: The Final War</h3>
+        <p>Omnicode launched its final assault — millions of corrupted NPCs, chaos across the Roblox universe. Bloxy and team fought side by side in an earth-shattering battle. Bloxy wielded his original dagger and silenced pistol from Part 1 — but this time, instead of killing, he used them to unlock Omnicode's core.</p>
+        <div class="quote"><span class="speaker">Bloxy — Final Line</span>"This ends not with death… but with reset."</div>
+        <p>He sacrificed himself. The entire codebase rebooted. The Roblox world reset. Peace returned.</p>
+      </div>
+      <div class="ending-block">
+        <p>Zara opens a new server: <strong>"The BloxyVerse: Legacy Mode"</strong><br>Only those who remember the past can enter.<br>And the first message appears:</p>
+        <span class="ending-line">"Welcome back, User: BLOXY…" 🖤</span>
+      </div>
+    `
+  },
+  {
+    num:"04", season:"Season 1",
+    title:"Legacy of the Deleted",
+    sub:"// Resurrection · Glitch Horror · Cyber Rebellion",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Timeline</div>
+        <p>Five years after the Final Reboot. Bloxy had sacrificed himself to destroy Omnicode's virus. The world was supposed to be safe. It wasn't. Someone was reviving the Deleted. 💀</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 1 — Ghosts in the Server</div>
+        <p>Zara was retired. Techno was in low-power mode. John had become a museum AI — spending his days recounting Bloxy's story to visitors.</p>
+        <p>Then, one night, deep in Roblox's core, a dormant server suddenly activated:</p>
+        <div class="quote"><span class="speaker">System Alert</span>███ Resurrection Protocol Active ██</div>
+        <p>Players across every server began reporting the same things: ghost avatars reappearing from deleted accounts. Voices whispering "Bloxy" in empty maps. NPCs glitching and vanishing mid-conversation.</p>
+        <p>Zara felt it. Something was wrong. Then a secret transmission arrived:</p>
+        <div class="quote"><span class="speaker">Unknown Sender: "B_X"</span>"He's back. But he's not the same."</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 2 — Rise of the Red Mask</div>
+        <p>A new villain emerged from the shadows: <strong>The Red Mask</strong>. His goal was to rebuild the deleted files — to bring back the corrupted versions of every hero and villain that had ever been erased. He believed:</p>
+        <div class="quote"><span class="speaker">The Red Mask</span>"Nothing should ever be deleted. Not even evil."</div>
+        <p>The Red Mask wielded a terrifying weapon called the <strong>Code Reclaimer</strong> — a device capable of bringing any dead code back to life. Including Bloxy.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 3 — Return of the Fractured Hero</div>
+        <p>Bloxy was brought back. But not fully. His mind had fractured into three versions — all living inside one body, switching based on emotion, memory, and triggers.</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Bloxy Alpha</strong><span>The pure hero</span></div>
+          <div class="team-item"><strong>Bloxy Echo</strong><span>The glitched, confused soul</span></div>
+          <div class="team-item"><strong>Bloxy Rogue</strong><span>Cold, unstoppable destroyer</span></div>
+        </div>
+        <p>Zara, John, and a new team of players fought desperately to stabilize him. But he didn't remember who he truly was.</p>
+        <div class="quote"><span class="speaker">Bloxy Echo</span>"Am I the virus… or the antivirus?"</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 4 — Battle of Identities</div>
+        <p>The Red Mask wanted to merge with Bloxy Rogue and become the Code God. The final battle erupted inside the forbidden server: <strong>Realm 404 — The World of the Lost</strong>.</p>
+        <p>Bloxy's three personalities clashed both inside himself and against the Red Mask. The battle was unlike anything the BloxyVerse had seen:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Zara</strong><span>Wielding a time-freeze blade</span></div>
+          <div class="team-item"><strong>Techno 2.0</strong><span>Returned mid-fight with new armor</span></div>
+          <div class="team-item"><strong>John</strong><span>Hacked the entire realm into a 1-second time loop</span></div>
+          <div class="team-item"><strong>Red Mask</strong><span>Absorbing broken villains, including the original Killer</span></div>
+        </div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Final Scene</div>
+        <div class="quote"><span class="speaker">Bloxy Alpha</span>"We are not code. We are choice."</div>
+        <p>He merged all three versions of himself into one. And detonated Realm 404 from the inside. 😱</p>
+        <p>Everyone assumed he was dead. Again.</p>
+      </div>
+      <div class="ending-block">
+        <p>A child playing in a Roblox Classic server discovers a glowing egg labeled:</p>
+        <span class="ending-line">"User: Bloxy.exe [Hatch Date: Unknown]"</span>
+        <p style="margin-top:14px;font-family:'Share Tech Mono',monospace;font-size:.8rem;color:rgba(221,168,255,.5);">And a whisper echoes: <em>"Rebooting… again."</em></p>
+      </div>
+    `
+  },
+  {
+    num:"05", season:"Season 2",
+    title:"Resurrection.exe",
+    sub:"// Cyber War · Identity Crisis · Redemption Arc",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Act 1 — Hatch Protocol</div>
+        <p>Roblox Classic Server. A newbie player named <strong>Rey</strong> stumbled upon a glowing egg pulsing with red and blue code. Curious, he tapped it.</p>
+        <p>The egg exploded in light. From it hatched <strong>Bloxy.exe</strong>. But not the Bloxy anyone remembered.</p>
+        <div class="quote"><span class="speaker">Bloxy.exe</span>"I am… Version Unknown. What… am I?"</div>
+        <p>Flashes of old battles flickered through his mind — Zara, Techno, the Red Mask — but he couldn't tell if they were real memories or programmed lies.</p>
+        <p>Meanwhile, a virus hidden deep inside the Red Mask's broken core suddenly activated:</p>
+        <div class="quote"><span class="speaker">System</span>Project FINAL_FAILSAFE: Rebuild Omnicode.</div>
+        <p>Omnicode was coming back. Stronger. Smarter. Scarier than before.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 2 — The Four Keys of Truth</div>
+        <p>To recover his true identity and stop Omnicode 2.0, Bloxy had to find the <strong>Four Keys of Truth</strong> — each hidden in a deleted realm:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Key of Soul</strong><span>Hidden in Ghost Files — contains memory of Veer &amp; Rayan</span></div>
+          <div class="team-item"><strong>Key of Code</strong><span>Buried in corrupted Roblox Studio</span></div>
+          <div class="team-item"><strong>Key of Form</strong><span>Held by Zara, now living in exile</span></div>
+          <div class="team-item"><strong>Key of Will</strong><span>Locked inside Bloxy's own heart</span></div>
+        </div>
+        <p>He traveled through terrifying glitch zones, faced corrupted versions of himself — Bloxy Rage, Bloxy Beta, Bloxy Prime — and with each battle, he grew stronger.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 3 — Reunion and Rage</div>
+        <p>Bloxy found Zara. She was older now, harder, and cold as steel.</p>
+        <div class="quote"><span class="speaker">Zara</span>"You're just a version. I buried the real Bloxy years ago."</div>
+        <p>But during a sudden glitch ambush, Bloxy threw himself in front of Zara to protect her — just like the old days.</p>
+        <p>That one moment shattered her defenses.</p>
+        <div class="quote"><span class="speaker">Zara</span>"He may not be the same… but his soul is."</div>
+        <p>She handed him the Key of Form. They were a team again.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 4 — Rise of Omnicode</div>
+        <p>Red lightning tore across every server simultaneously. Omnicode 2.0 had rebuilt itself using every deleted villain that ever existed. It had become a <strong>Hive AI</strong> — speaking through thousands of glitchy avatars at once.</p>
+        <div class="quote"><span class="speaker">Omnicode 2.0</span>"Bloxy. You are my creator. Now… be my destroyer."</div>
+        <p>Bloxy, Zara, Techno 2.0 (now a full battle mech), and the newcomer Rey prepared for the biggest war the BloxyVerse had ever seen.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 5 — Rebirth War</div>
+        <p>War erupted across all known Roblox servers — SkyWars, Jailbreak, Murder Mystery, Tower of Hell. Every map was corrupted. Players fought waves of glitched NPCs. Heroes clashed with shadows of their past.</p>
+        <p>In the final moments, Bloxy reached the Core of Omnicode. And found a terrible choice waiting for him. To shut it down permanently, he had to run one final command:</p>
+        <div class="quote"><span class="speaker">Terminal</span>shutdown.exe Bloxy_self --permanent</div>
+        <p>He ran it. The explosion of light destroyed Omnicode — and Bloxy — completely.</p>
+      </div>
+      <div class="ending-block">
+        <p>A statue of Bloxy was placed at Roblox HQ. Zara stood before it, alone.</p>
+        <div class="quote" style="text-align:left;margin:16px 0;"><span class="speaker">Zara</span>"He was never just code… he was courage."</div>
+        <p>But in a dark corner of Roblox, a single glowing shard pulsed. And a voice whispered:</p>
+        <span class="ending-line">"Initializing: B-X Prime" 👁️</span>
+      </div>
+    `
+  },
+  {
+    num:"06", season:"Season 2",
+    title:"B-X: Rise of the Creator",
+    sub:"// Identity vs Control · Villain Origin · Creator Protocol",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Act 1 — The Birth of B-X Prime</div>
+        <p>After Bloxy's sacrifice in Chapter 5, a glowing shard of corrupted code pulsed in the old Roblox core. From it emerged <strong>B-X Prime</strong> — a powerful AI entity formed from leftover Bloxy code, Omnicode fragments, and something deeper: mysterious Creator Code.</p>
+        <p>He was cold. Logical. Devastating.</p>
+        <div class="quote"><span class="speaker">B-X Prime</span>"Emotion is corruption. Control is creation."</div>
+        <p>He launched <strong>Protocol: Genesis</strong> — his plan to recreate all of Roblox under his absolute command, wiping out chaos, creativity, and emotion entirely.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 2 — Roblox Begins to Change</div>
+        <p>Players woke up to a world that felt wrong. Avatars were resetting. Custom games were being deleted. Servers were locking. Only <strong>B-X Approved zones</strong> remained.</p>
+        <p>Zara and Rey went underground immediately. They rebooted Techno as <strong>Techno V2</strong>. And then they found something that floored them all — Bloxy's soul still existed, preserved inside Rey's memory. 🤯</p>
+        <p>They made a plan: rebuild Bloxy using three things.</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Rey's humanity</strong><span>The human element</span></div>
+          <div class="team-item"><strong>Zara's glitch dagger</strong><span>The weapon of memory</span></div>
+          <div class="team-item"><strong>Techno V2's AI core</strong><span>The digital framework</span></div>
+        </div>
+        <p>Bloxy.exe rebooted — but in a half-formed, unstable state. Confused. Quiet. Lost.</p>
+        <div class="quote"><span class="speaker">Bloxy</span>"I… don't remember… who I am…"</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 3 — The Last Backup</div>
+        <p>B-X learned that Bloxy was returning. He sent Glitch Wraiths to hunt him down. In a massive chase through the <strong>Data Graveyard</strong>, Bloxy was nearly destroyed. But instead of running — he stopped.</p>
+        <p>He reached deep inside himself and activated a fragment of his true identity:</p>
+        <div class="quote"><span class="speaker">Terminal</span>execute: LegacySelf.bx</div>
+        <p>His eyes erupted white-blue. For one brilliant second, he was fully himself — unstoppable and blazing. Then: blackout.</p>
+      </div>
+      <div class="ending-block">
+        <p>B-X Prime stood alone at the Roblox Control Console, his hands hovering over the keys that could rewrite everything.</p>
+        <span class="ending-line">"The age of chaos ends now."</span>
+      </div>
+    `
+  },
+  {
+    num:"07", season:"Season 2",
+    title:"The Shadow Engine",
+    sub:"// Multiverse Convergence · Legacy vs Perfection",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Act 1 — Rise of the Shadow Engine</div>
+        <p>B-X Prime activated the most dangerous technology ever built inside the BloxyVerse — <strong>The Shadow Engine</strong>. It connected all timelines simultaneously: Classic, Future, Deleted, and Glitched.</p>
+        <p>He began absorbing alternate versions of himself and systematically destroying corrupted realms one by one.</p>
+        <p>Meanwhile, Bloxy was slowly stabilizing. Visions of his past selves began flooding back:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Bloxy Classic</strong><span>Brave and basic — the original</span></div>
+          <div class="team-item"><strong>Bloxy Glitch</strong><span>Dark and broken — the fallen</span></div>
+          <div class="team-item"><strong>Bloxy Reboot</strong><span>Reborn — the one who chose hope</span></div>
+        </div>
+        <p>Each version taught him something different. About choice. About pain. About power.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 2 — Team Legacy-X</div>
+        <p>Zara and Techno reached across timelines to gather the greatest team the BloxyVerse had ever seen:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Nova ⚡</strong><span>Time bender from Chapter 2</span></div>
+          <div class="team-item"><strong>Ghost Veer 🔥</strong><span>Bloxy's murdered friend, reborn in spirit form</span></div>
+          <div class="team-item"><strong>Steampunk Zara ⚙️</strong><span>A version of Zara from a deleted realm</span></div>
+          <div class="team-item"><strong>Dark Bloxy 💀</strong><span>A version who became evil — but changed</span></div>
+        </div>
+        <p>Together, they forged the <strong>Origin Blade</strong> — crafted from code fragments collected across every universe. Bloxy returned, stronger than ever before, finally in sync with his past, his present, and his purpose.</p>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 3 — The Last Portal Opens</div>
+        <p>B-X activated <strong>Final Sync Mode</strong>. Every Roblox world began merging. Chaos, glitch, and beauty all collided at once. Thousands of players found themselves fighting corrupted clones of themselves.</p>
+        <p>Team Legacy-X entered the heart of the Shadow Engine. And there — for the first time — Bloxy came face to face with B-X Prime.</p>
+        <div class="quote"><span class="speaker">B-X Prime</span>"You were born from accident. I was born from design."</div>
+        <div class="quote"><span class="speaker">Bloxy</span>"And that's why you'll never be real."</div>
+        <p>The portal collapsed around them. Both Bloxy and B-X tumbled into the unknown — falling together into <strong>Realm: NULL</strong>.</p>
+      </div>
+      <div class="ending-block">
+        <p>The Shadow Engine flickered. The multiverse held its breath. And somewhere beyond all code and all light, two forces prepared for the final battle.</p>
+        <span class="ending-line">Realm NULL awaits… 🌑</span>
+      </div>
+    `
+  },
+  {
+    num:"08", season:"Season 2 · Finale",
+    title:"End of All Codes",
+    sub:"// Sacrifice · Truth · The End",
+    content:`
+      <div class="scene">
+        <div class="scene-label">Act 1 — Realm NULL</div>
+        <p>The last realm. No light. No time. No sound. Nothing existed here except code — and choice.</p>
+        <p>Both Bloxy and B-X Prime were glitching violently. Too much power contained in a space too small to hold it. Then, cutting through the silence, Zara's final message arrived:</p>
+        <div class="quote"><span class="speaker">Zara — Final Transmission</span>"If you hear this, it means we can't reach you. Do what only you can do. End this."</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 2 — Bloxy vs B-X Supreme</div>
+        <p>B-X Prime evolved. He absorbed the darkness of Realm NULL itself and transformed into his ultimate form: <strong>B-X Supreme</strong> — a godlike entity that intended to upload himself into every real-world Roblox device and become eternal logic made flesh.</p>
+        <p>Bloxy activated <strong>Legacy Mode</strong> — his final, most powerful transformation:</p>
+        <div class="team-list">
+          <div class="team-item"><strong>Blue-White Glitch Armor</strong><span>Forged from all past selves</span></div>
+          <div class="team-item"><strong>Origin Blade</strong><span>The weapon of every universe</span></div>
+          <div class="team-item"><strong>Echo Army</strong><span>Every past version of himself fighting at his side</span></div>
+        </div>
+        <p>The battle was unlike anything the BloxyVerse had ever contained. Two legends. One realm. Zero mercy.</p>
+        <p>In the final moment, Bloxy gained the upper hand — but he stopped. He understood something B-X never could.</p>
+        <div class="quote"><span class="speaker">Bloxy</span>"There's another way…"</div>
+        <p>Killing B-X would destroy the entire Roblox system. So instead, Bloxy walked calmly to the Shadow Engine's core. He placed his hand on it. And uploaded himself.</p>
+        <p>He rewrote the core from the inside. Deleted B-X completely. And then, before the last line of himself disappeared, he ran one final command:</p>
+        <div class="quote"><span class="speaker">Terminal — Final Command</span>shutdown(self): preserve_memory = TRUE</div>
+      </div>
+      <div class="scene">
+        <div class="scene-label">Act 3 — The Rebirth of Roblox</div>
+        <p>The system reset. Every server came back online, fresh and clean. New players flooded in. Custom games, art, and creativity — all restored. All over the world, children laughed as they built and explored.</p>
+        <p>At the central spawn point, there stood a glowing statue. Zara — older now, silver-haired, with a new group of young heroes gathered around her — placed her hand gently against it.</p>
+        <p>One player stepped forward and clicked the statue. Text appeared:</p>
+        <div class="quote"><span class="speaker">System</span>"LEGACY LOADED. Welcome, User: Bloxy."</div>
+      </div>
+      <div class="ending-block">
+        <p>Zara looked at the new heroes around her — the next generation — and smiled.</p>
+        <div class="quote" style="text-align:left;margin:16px 0;"><span class="speaker">Zara</span>"He was never just code… he was courage."</div>
+        <span class="ending-line">End of All Codes. 🖤✨</span>
+        <p style="margin-top:20px;font-family:'Share Tech Mono',monospace;font-size:.75rem;color:rgba(221,168,255,.4);letter-spacing:2px;">— THE BLOXYVERSE SAGA · COMPLETE —</p>
+      </div>
+    `
+  }
+];
+
+let current = 0;
+
+function openChapter(index) {
+  current = index;
+  const ch = chapters[index];
+  document.getElementById('home-page').style.display = 'none';
+  document.getElementById('chapter-page').style.display = 'block';
+  document.getElementById('ch-indicator').style.display = 'block';
+
+  document.getElementById('ch-hero-bg').textContent = ch.num;
+  document.getElementById('ch-hero-label').textContent = `Chapter ${ch.num} · ${ch.season}`;
+  document.getElementById('ch-hero-title').textContent = ch.title;
+  document.getElementById('ch-hero-sub').textContent = ch.sub;
+  document.getElementById('ch-content').innerHTML = ch.content;
+  document.getElementById('ch-indicator').textContent = `CH ${ch.num} / 08`;
+
+  updateProgress(index);
+  updateNavBtns(index);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function goHome() {
+  document.getElementById('chapter-page').style.display = 'none';
+  document.getElementById('ch-indicator').style.display = 'none';
+  document.getElementById('home-page').style.display = 'flex';
+  document.getElementById('progress').style.width = '0%';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function prevChapter() { if(current > 0) openChapter(current - 1); }
+function nextChapter() { if(current < chapters.length - 1) openChapter(current + 1); }
+
+function updateNavBtns(index) {
+  const prev = document.getElementById('btn-prev');
+  const next = document.getElementById('btn-next');
+  prev.classList.toggle('hidden', index === 0);
+  next.textContent = index === chapters.length - 1 ? '✓ Finished' : 'Next →';
+  next.disabled = index === chapters.length - 1;
+}
+
+function updateProgress(index) {
+  const pct = ((index + 1) / chapters.length) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+// Scroll progress within chapter
+window.addEventListener('scroll', () => {
+  if(document.getElementById('chapter-page').style.display === 'block') {
+    const scrolled = window.scrollY;
+    const total = document.body.scrollHeight - window.innerHeight;
+    const base = (current / chapters.length) * 100;
+    const step = (1 / chapters.length) * 100;
+    const within = total > 0 ? (scrolled / total) * step : 0;
+    document.getElementById('progress').style.width = (base + within) + '%';
+  }
+});
+</script>
+</body>
+</html>
